@@ -13,8 +13,8 @@ import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseFragment;
 import com.ghf.eshop.network.EShopClient;
 import com.ghf.eshop.network.core.UICallback;
-import com.ghf.eshop.network.entity.CategoryPrimary;
-import com.ghf.eshop.network.entity.CategoryRsp;
+import com.ghf.eshop.network.entity.category.CategoryPrimary;
+import com.ghf.eshop.network.entity.category.CategoryRsp;
 import com.google.gson.Gson;
 
 import java.io.IOException;

@@ -1,11 +1,11 @@
-package com.ghf.eshop.network.entity;
+package com.ghf.eshop.network.entity.category;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
 /**
- * Created by Administrator on 2017/2/23 0023.
+ * 商品分类响应体
  */
 public class CategoryRsp {
 

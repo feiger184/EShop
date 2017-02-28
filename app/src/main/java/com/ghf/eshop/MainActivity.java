@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import com.ghf.eshop.base.BaseActivity;
 import com.ghf.eshop.feature.TestFragment;
 import com.ghf.eshop.feature.category.CategoryFragment;
+import com.ghf.eshop.feature.home.HomeFragment;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -18,7 +19,7 @@ public class MainActivity extends BaseActivity implements OnTabSelectListener {
     @BindView(R.id.bottom_bar)
     BottomBar mBottomBar;
 
-    private TestFragment mHomeFragment;
+    private HomeFragment mHomeFragment;
     private CategoryFragment mCategoryFragment;
     private TestFragment mCartFragment;
     private TestFragment mMineFragment;
@@ -45,7 +46,7 @@ public class MainActivity extends BaseActivity implements OnTabSelectListener {
         switch (tabId) {
             case R.id.tab_home:
                 if (mHomeFragment == null) {
-                    mHomeFragment = TestFragment.newInstance("HomeFragment");
+                    mHomeFragment = HomeFragment.newInstance();
                 }
                 switchFragment(mHomeFragment);
                 break;
@@ -102,7 +103,7 @@ public class MainActivity extends BaseActivity implements OnTabSelectListener {
     // 恢复因为系统重启造成的Fragmentmanager里面恢复的Fragment
     private void retrieveFragment() {
         FragmentManager manager = getSupportFragmentManager();
-        mHomeFragment = (TestFragment) manager.findFragmentByTag("HomeFragment");
+        mHomeFragment = (HomeFragment) manager.findFragmentByTag(HomeFragment.class.getName());
         mCategoryFragment = (CategoryFragment) manager.findFragmentByTag(CategoryFragment.class.getName());
         mCartFragment = (TestFragment) manager.findFragmentByTag("CartFragment");
         mMineFragment = (TestFragment) manager.findFragmentByTag("MineFragment");

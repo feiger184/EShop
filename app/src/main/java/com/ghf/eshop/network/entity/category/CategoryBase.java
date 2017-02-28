@@ -1,4 +1,4 @@
-package com.ghf.eshop.network.entity;
+package com.ghf.eshop.network.entity.category;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -5,7 +5,7 @@ import android.widget.TextView;
 
 import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseListAdapter;
-import com.ghf.eshop.network.entity.CategoryBase;
+import com.ghf.eshop.network.entity.category.CategoryBase;
 
 import butterknife.BindView;
 
