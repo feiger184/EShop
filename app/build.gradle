@@ -44,4 +44,10 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     //圆点指示器
     compile 'me.relex:circleindicator:1.2.2@aar'
+    // 下拉刷新和上拉加载的控件
+    compile 'in.srain.cube:ptr-load-more:1.0.2'
+
+    // picasso和转换库
+    compile 'jp.wasabeef:picasso-transformations:2.1.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }

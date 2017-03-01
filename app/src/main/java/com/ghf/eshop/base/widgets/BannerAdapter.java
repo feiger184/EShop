@@ -22,9 +22,9 @@ public abstract class BannerAdapter<T> extends PagerAdapter {
 
     private List<T> dataSet = new ArrayList<>();
 
-    public void reset(List<T> data ) {
+    public void reset(List<T> data) {
         dataSet.clear();
-        if (data!=null) dataSet.addAll(data);
+        if (data != null) dataSet.addAll(data);
         notifyDataSetChanged();
 
     }
@@ -58,7 +58,7 @@ public abstract class BannerAdapter<T> extends PagerAdapter {
     public static class ViewHolder {
 
         @BindView(R.id.image_banner_item)
-        ImageView imageView;
+        public ImageView imageView;
         private View itemView;
 
         public ViewHolder(View itemView) {

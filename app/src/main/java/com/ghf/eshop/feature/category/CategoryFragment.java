@@ -1,16 +1,16 @@
 package com.ghf.eshop.feature.category;
 
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseFragment;
+import com.ghf.eshop.base.wrapper.ToastWrapper;
+import com.ghf.eshop.base.wrapper.ToolbarWrapper;
 import com.ghf.eshop.network.EShopClient;
 import com.ghf.eshop.network.core.UICallback;
 import com.ghf.eshop.network.entity.category.CategoryPrimary;
@@ -71,7 +71,7 @@ public class CategoryFragment extends BaseFragment {
             call.enqueue(new UICallback() {
                 @Override
                 public void onFailureInUI(Call call, IOException e) {
-                    Toast.makeText(getContext(), "请求失败" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    ToastWrapper.show("请求失败");
                 }
 
                 @Override
@@ -119,7 +119,7 @@ public class CategoryFragment extends BaseFragment {
     public void OnChildrenClick(int position) {
         String name = childrenAdapter.getItem(position).getName();
         // TODO: 2017/2/28 0028 完善到跳转页面
-        Toast.makeText(getContext(), name, Toast.LENGTH_SHORT).show();
+        ToastWrapper.show(name);
     }
 
     /*
@@ -128,11 +128,8 @@ public class CategoryFragment extends BaseFragment {
     private void initToolbar() {
 
         setHasOptionsMenu(true);//设置fragment有选项菜单
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
-        activity.setSupportActionBar(toolbar);
-        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);//设置左上方的返回箭头
-        toolBarTitle.setText(R.string.category_title);
+
+        new ToolbarWrapper(this).setCustomTitle(R.string.category_title);
     }
 
     @Override
@@ -149,7 +146,7 @@ public class CategoryFragment extends BaseFragment {
         }
         if (itemId == R.id.menu_search) {
             // TODO: 2017/2/28 0028 跳转到搜索 
-            Toast.makeText(getContext(), "dianijispusuio", Toast.LENGTH_SHORT).show();
+            ToastWrapper.show("点击了搜索按钮");
         }
         return super.onOptionsItemSelected(item);
     }

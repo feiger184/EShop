@@ -2,6 +2,7 @@ package com.ghf.eshop.feature;
 
 import android.app.Application;
 
+import com.ghf.eshop.base.wrapper.ToastWrapper;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -18,5 +19,7 @@ public class EShopApplication extends Application {
         }
         LeakCanary.install(this);//真正的初始化
 
+        //Toast包装类的初始化
+        ToastWrapper.init(this);
     }
 }
