@@ -1,5 +1,6 @@
 package com.ghf.eshop.feature.home;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -7,6 +8,7 @@ import android.widget.Toast;
 
 import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseListAdapter;
+import com.ghf.eshop.feature.goods.GoodsActivity;
 import com.ghf.eshop.network.entity.home.CategoryHome;
 import com.ghf.eshop.network.entity.home.Picture;
 import com.ghf.eshop.network.entity.home.SimpleGoods;
@@ -64,7 +66,9 @@ public class HomeGoodsAdapter extends BaseListAdapter<CategoryHome, HomeGoodsAda
                 imageViews[i].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(getContext(), goodsList.get(index).getName(), Toast.LENGTH_SHORT).show();
+                        SimpleGoods simpleGoods = goodsList.get(index);
+                        Intent intent = GoodsActivity.getStartIntent(getContext(), simpleGoods.getId());
+                        getContext().startActivity(intent);
 
                     }
                 });

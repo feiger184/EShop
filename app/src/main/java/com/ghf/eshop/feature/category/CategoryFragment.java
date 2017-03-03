@@ -1,5 +1,6 @@
 package com.ghf.eshop.feature.category;
 
+import android.content.Intent;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,14 +10,15 @@ import android.widget.TextView;
 
 import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseFragment;
-import com.ghf.eshop.base.wrapper.ToastWrapper;
 import com.ghf.eshop.base.wrapper.ToolbarWrapper;
+import com.ghf.eshop.feature.serach.SearchGoodsActivity;
 import com.ghf.eshop.network.EShopClient;
 import com.ghf.eshop.network.core.ApiPath;
 import com.ghf.eshop.network.core.ResponseEntity;
 import com.ghf.eshop.network.core.UICallback;
 import com.ghf.eshop.network.entity.category.CategoryPrimary;
 import com.ghf.eshop.network.entity.category.CategoryRsp;
+import com.ghf.eshop.network.entity.search.Filter;
 
 import java.util.List;
 
@@ -102,17 +104,22 @@ public class CategoryFragment extends BaseFragment {
 
     }
 
+    //点击一级分类
     @OnItemClick(R.id.list_category)
     public void OnItemClick(int position) {
         chooseCategory(position);
     }
 
+    //点击二级分类
     @OnItemClick(R.id.list_children)
     public void OnChildrenClick(int position) {
-        String name = childrenAdapter.getItem(position).getName();
-        // TODO: 2017/2/28 0028 完善到跳转页面
-        ToastWrapper.show(name);
+        int categoryId = childrenAdapter.getItem(position).getId();
+
+        // 点击二级分类 跳转到搜索页面
+        navigateToSearch(categoryId);
+
     }
+
 
     /*
     * 处理Toolbar
@@ -137,9 +144,23 @@ public class CategoryFragment extends BaseFragment {
             return true;
         }
         if (itemId == R.id.menu_search) {
-            // TODO: 2017/2/28 0028 跳转到搜索 
-            ToastWrapper.show("点击了搜索按钮");
+            //   跳转到搜索界面
+            int position = listCategory.getCheckedItemPosition();
+            int id = categoryAdapter.getItem(position).getId();
+            navigateToSearch(id);
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    /*
+    * 跳转到搜索页面
+    * */
+    private void navigateToSearch(int categoryId) {
+        Filter filter = new Filter();
+        filter.setCategoryId(categoryId);
+        Intent intent = SearchGoodsActivity.getStartIntent(getContext(), filter);
+        getActivity().startActivity(intent);
     }
 }

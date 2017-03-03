@@ -1,5 +1,6 @@
 package com.ghf.eshop.feature.home;
 
+import android.content.Intent;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +13,8 @@ import com.ghf.eshop.base.BaseFragment;
 import com.ghf.eshop.base.widgets.BannerAdapter;
 import com.ghf.eshop.base.widgets.BannerLayout;
 import com.ghf.eshop.base.wrapper.PtrWrapper;
-import com.ghf.eshop.base.wrapper.ToastWrapper;
 import com.ghf.eshop.base.wrapper.ToolbarWrapper;
+import com.ghf.eshop.feature.goods.GoodsActivity;
 import com.ghf.eshop.network.EShopClient;
 import com.ghf.eshop.network.core.ApiPath;
 import com.ghf.eshop.network.core.ResponseEntity;
@@ -181,7 +182,10 @@ public class HomeFragment extends BaseFragment {
             ivPromotes[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ToastWrapper.show(simpleGoods.getName());
+                    int id = simpleGoods.getId();
+                    Intent intent = GoodsActivity.getStartIntent(getContext(), id);
+                    getActivity().startActivity(intent);
+
                 }
             });
         }

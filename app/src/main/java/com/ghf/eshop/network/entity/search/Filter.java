@@ -21,10 +21,10 @@ public class Filter {
     public @interface SortOrder {
     }
 
-    @SerializedName("keywords")
+    @SerializedName("keywords")  //关键字
     private String mKeywords;
 
-    @SerializedName("category_id")
+    @SerializedName("category_id")  //分类Id
     private int mCategoryId;
 
     @SerializedName("sort_by")
