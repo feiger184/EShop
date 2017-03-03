@@ -1,6 +1,6 @@
 package com.ghf.eshop.network;
 
-import com.ghf.eshop.network.core.RequestParam;
+import com.ghf.eshop.network.core.ApiInterface;
 import com.ghf.eshop.network.core.ResponseEntity;
 import com.ghf.eshop.network.core.UICallback;
 import com.google.gson.Gson;
@@ -43,67 +43,14 @@ public class EShopClient {
                 .addInterceptor(interceptor)
                 .build();
     }
-//
-//    //构建商品分类的接口请求
-//    public Call getCategory() {
-//        Request request = new Request.Builder()
-//                .get()
-//                .url(BASE_URL + "/category")
-//                .build();
-//        return okHttpClient.newCall(request);
-//    }
-//
-//
-//    /*
-//    * 首页 banner请求接口
-//    * */
-//    public Call getHomeBanner() {
-//
-//        Request request = new Request.Builder()
-//                .get()
-//                .url(BASE_URL + "/home/data")
-//                .build();
-//
-//        return okHttpClient.newCall(request);
-//    }
-//
-//    /*
-//    * 首页 分类 和 推荐商品
-//    * */
-//    public Call getHomeCategory() {
-//
-//        Request request = new Request.Builder()
-//                .get()
-//                .url(BASE_URL + "/home/category")
-//                .build();
-//        return okHttpClient.newCall(request);
-//    }
-//
-//    /*
-//    * 搜索： 搜索商品
-//    * */
-//    public Call getSearch(SearchReq searchReq) {
-//        String param = new Gson().toJson(searchReq);
-//
-//        RequestBody requestBody = new FormBody.Builder()
-//                .add("json", param)
-//                .build();
-//
-//        Request request = new Request.Builder()
-//                .post(requestBody)
-//                .url(BASE_URL + "/search")
-//                .build();
-//        return okHttpClient.newCall(request);
-//    }
+
 
     /*
     * 同步
     * */
-    public <T extends ResponseEntity> T execute(String path,
-                                                RequestParam requestParam,
-                                                Class<T> clazz) throws IOException {
-        Response response = newApiCall(path, requestParam).execute();
-
+    public <T extends ResponseEntity> T execute(ApiInterface apiInterface) throws IOException {
+        Response response = newApiCall(apiInterface, null).execute();
+        Class<T> clazz = (Class<T>) apiInterface.getResponseEntity();
         return getResponseEntity(response, clazz);
 
     }
@@ -111,31 +58,31 @@ public class EShopClient {
     /*
     * 异步
     * */
-    public Call enqueue(String path,
-                        RequestParam requestParam,
-                        Class<? extends ResponseEntity> clazz,
-                        UICallback uiCallBack) {
+    public Call enqueue(ApiInterface apiInterface,
+                        UICallback uiCallBack, String tag) {
 
-        Call call = newApiCall(path, requestParam);
-        uiCallBack.setResponseType(clazz);
+        Call call = newApiCall(apiInterface, tag);
+        uiCallBack.setResponseType(apiInterface.getResponseEntity());
         call.enqueue(uiCallBack);
         return call;
     }
 
 
     //根据参数构建请求
-    private Call newApiCall(String path, RequestParam requestParam) {
+    private Call newApiCall(ApiInterface apiInterface, String tag) {
         Request.Builder builder = new Request.Builder();
-        builder.url(BASE_URL + path);
+        builder.url(BASE_URL + apiInterface.getPath());
 
         //如果有请求体
-        if (requestParam != null) {
-            String json = gson.toJson(requestParam);
+        if (apiInterface.getRequestParam() != null) {
+            String json = gson.toJson(apiInterface.getRequestParam());
             RequestBody requestBody = new FormBody.Builder()
                     .add("json", json)
                     .build();
             builder.post(requestBody);
         }
+
+        builder.tag(tag); //设置Tag
 
         Request request = builder.build();
         return okHttpClient.newCall(request);
@@ -152,4 +99,22 @@ public class EShopClient {
         //成功
         return gson.fromJson(response.body().string(), clazz);
     }
+
+    //给请求设置Tag 取消请求时 通过判断Tag 来取消请求
+    public void CancelByTag(String tag) {
+
+       /* 1.调度器中等待执行的*/
+        for (Call call : okHttpClient.dispatcher().queuedCalls()) {
+            if (call.request().tag().equals(tag)) {
+                call.cancel();
+            }
+        }
+        /*2.调度器中正在执行的*/
+        for (Call call : okHttpClient.dispatcher().runningCalls()) {
+            if (call.request().tag().equals(tag)) {
+                call.cancel();
+            }
+        }
+    }
+
 }

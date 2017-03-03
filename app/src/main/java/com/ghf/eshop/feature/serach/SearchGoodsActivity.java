@@ -13,15 +13,13 @@ import com.ghf.eshop.base.wrapper.PtrWrapper;
 import com.ghf.eshop.base.wrapper.ToastWrapper;
 import com.ghf.eshop.base.wrapper.ToolbarWrapper;
 import com.ghf.eshop.feature.goods.GoodsActivity;
-import com.ghf.eshop.network.EShopClient;
+import com.ghf.eshop.network.api.ApiSearch;
 import com.ghf.eshop.network.core.ApiPath;
 import com.ghf.eshop.network.core.ResponseEntity;
-import com.ghf.eshop.network.core.UICallback;
 import com.ghf.eshop.network.entity.home.SimpleGoods;
 import com.ghf.eshop.network.entity.search.Filter;
 import com.ghf.eshop.network.entity.search.Paginated;
 import com.ghf.eshop.network.entity.search.Pagination;
-import com.ghf.eshop.network.entity.search.SearchReq;
 import com.ghf.eshop.network.entity.search.SearchRsp;
 import com.google.gson.Gson;
 
@@ -54,6 +52,8 @@ public class SearchGoodsActivity extends BaseActivity {
     private Call searchCall;
     private PtrWrapper ptrWrapper;
     private Paginated paginated;//  分页结果
+    private long lastRefreshTime;
+
 
     public static Intent getStartIntent(Context context, Filter filter) {
         Intent intent = new Intent(context, SearchGoodsActivity.class);
@@ -61,11 +61,13 @@ public class SearchGoodsActivity extends BaseActivity {
         return intent;
     }
 
+    //添加布局
     @Override
     protected int getContentViewLayout() {
         return R.layout.activity_search_goods;
     }
 
+    //初始化
     @Override
     protected void initView() {
         //设置Toolbar
@@ -116,7 +118,8 @@ public class SearchGoodsActivity extends BaseActivity {
     @OnItemClick({R.id.list_goods})
     public void goodsItemClick(int position) {
         //跳转到商品详情页
-        Intent intent = GoodsActivity.getStartIntent(this, searchgoodsAdapter.getItem(position).getId());
+        int id = searchgoodsAdapter.getItem(position).getId();
+        Intent intent = GoodsActivity.getStartIntent(this, id);
         startActivity(intent);
 
     }
@@ -132,6 +135,7 @@ public class SearchGoodsActivity extends BaseActivity {
         for (TextView sortView : tvOrderList) {
             sortView.setActivated(false);
         }
+
         //选择的
         view.setActivated(true);
 
@@ -152,7 +156,10 @@ public class SearchGoodsActivity extends BaseActivity {
                 throw new UnsupportedOperationException();
         }
         filter.setSortBy(sortBy);
-        ptrWrapper.autoRefresh();
+        // 简单解决切换过快的问题
+        long time = 2000 + lastRefreshTime - System.currentTimeMillis();
+        time = time < 0 ? 0 : time;
+        ptrWrapper.postRefreshDelayed(time);
 
     }
 
@@ -164,39 +171,45 @@ public class SearchGoodsActivity extends BaseActivity {
         }
 
         if (isRefresh) {
+            lastRefreshTime = System.currentTimeMillis();
+
             pagination.reset();//刷新 页数从1开始
             goodsListView.setSelection(0);//将ListView定义到第一条数据
         } else {
             //加载时 页数加一
             pagination.next();
         }
-        //请求体
-        SearchReq searchReq = new SearchReq();
-        searchReq.setFilter(filter);
-        searchReq.setPagination(pagination);
-        searchCall = EShopClient.getInstance().enqueue(ApiPath.SEARCH, searchReq, SearchRsp.class, uiCallback);
+//        //请求体
+//        SearchReq searchReq = new SearchReq();
+//        searchReq.setFilter(filter);
+//        searchReq.setPagination(pagination);
+
+        ApiSearch apiSearch = new ApiSearch(filter, pagination);
+        searchCall = enqueue(apiSearch);
 
     }
 
-    private UICallback uiCallback = new UICallback() {
-
-        @Override
-        public void onBusinessResponse(boolean isSucces, ResponseEntity responseEntity) {
-            ptrWrapper.stopRefresh();
-            searchCall = null;
-            if (isSucces) {
-                SearchRsp searchRsp = (SearchRsp) responseEntity;
-                paginated = searchRsp.getPaginated();
-                List<SimpleGoods> simpleGoodsList = searchRsp.getData();
-                if (pagination.isFirst()) {
-                    //刷新
-                    searchgoodsAdapter.reset(simpleGoodsList);
-                } else {
-                    //加载
-                    searchgoodsAdapter.addAll(simpleGoodsList);
-                }
-            }
-
+    // 拿到数据处理
+    @Override
+    protected void onBusinessResponse(String path, boolean isSucces, ResponseEntity responseEntity) {
+        if (!ApiPath.SEARCH.equals(path)) {
+            throw new UnsupportedOperationException(path);
         }
-    };
+
+        ptrWrapper.stopRefresh();
+        searchCall = null;
+        if (isSucces) {
+            SearchRsp searchRsp = (SearchRsp) responseEntity;
+            paginated = searchRsp.getPaginated();
+            List<SimpleGoods> simpleGoodsList = searchRsp.getData();
+            if (pagination.isFirst()) {
+                //刷新
+                searchgoodsAdapter.reset(simpleGoodsList);
+            } else {
+                //加载
+                searchgoodsAdapter.addAll(simpleGoodsList);
+            }
+        }
+    }
+
 }

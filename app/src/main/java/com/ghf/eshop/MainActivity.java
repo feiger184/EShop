@@ -9,6 +9,7 @@ import com.ghf.eshop.base.BaseActivity;
 import com.ghf.eshop.feature.TestFragment;
 import com.ghf.eshop.feature.category.CategoryFragment;
 import com.ghf.eshop.feature.home.HomeFragment;
+import com.ghf.eshop.network.core.ResponseEntity;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
@@ -29,6 +30,11 @@ public class MainActivity extends BaseActivity implements OnTabSelectListener {
     @Override
     protected int getContentViewLayout() {
         return R.layout.activity_eshop_main;
+    }
+
+    @Override
+    protected void onBusinessResponse(String path, boolean isSucces, ResponseEntity responseEntity) {
+
     }
 
     @Override

@@ -15,10 +15,10 @@ import com.ghf.eshop.base.widgets.BannerLayout;
 import com.ghf.eshop.base.wrapper.PtrWrapper;
 import com.ghf.eshop.base.wrapper.ToolbarWrapper;
 import com.ghf.eshop.feature.goods.GoodsActivity;
-import com.ghf.eshop.network.EShopClient;
+import com.ghf.eshop.network.api.ApiHomeBanner;
+import com.ghf.eshop.network.api.ApiHomeCategory;
 import com.ghf.eshop.network.core.ApiPath;
 import com.ghf.eshop.network.core.ResponseEntity;
-import com.ghf.eshop.network.core.UICallback;
 import com.ghf.eshop.network.entity.home.Banner;
 import com.ghf.eshop.network.entity.home.HomeBannerRsp;
 import com.ghf.eshop.network.entity.home.HomeCategoryRsp;
@@ -80,7 +80,11 @@ public class HomeFragment extends BaseFragment {
 
                 bannerRefreshed = false;
                 categoryRefreshed = false;
-                getHomeData();
+
+                // 轮播图的数据获取
+                enqueue(new ApiHomeBanner());
+                // 分类及推荐商品数据
+                enqueue(new ApiHomeCategory());
             }
 
             @Override
@@ -125,45 +129,33 @@ public class HomeFragment extends BaseFragment {
         listView.setAdapter(goodsAdapter);
     }
 
-    /*
-    * 去请求数据
-    * */
-    public void getHomeData() {
-        UICallback bannerCallBack = new UICallback() {
-            @Override
-            public void onBusinessResponse(boolean isSucces, ResponseEntity responseEntity) {
+    @Override
+    protected void onBusinessResponse(String path, boolean isSucces, ResponseEntity responseEntity) {
+        switch (path) {
+            case ApiPath.HOME_DATA:
                 bannerRefreshed = true;
                 if (isSucces) {
                     HomeBannerRsp bannerRsp = (HomeBannerRsp) responseEntity;
                     bannerAdapter.reset(bannerRsp.getData().getBanners());
                     setPromoteGoods(bannerRsp.getData().getGoodsList());
                 }
-                if (bannerRefreshed && categoryRefreshed) {
-                    //两个接口都拿到数据之后，停止刷新
-                    ptrWrapper.stopRefresh();
-                }
-            }
-        };
-
-        // 首页分类商品和推荐
-        UICallback categoryCallback = new UICallback() {
-            @Override
-            public void onBusinessResponse(boolean isSucces, ResponseEntity responseEntity) {
+                break;
+            case ApiPath.HOME_CATEGORY:
                 categoryRefreshed = true;
                 if (isSucces) {
                     HomeCategoryRsp categoryRsp = (HomeCategoryRsp) responseEntity;
                     goodsAdapter.reset(categoryRsp.getData());
                 }
-                if (bannerRefreshed && categoryRefreshed) {
-                    //两个接口都拿到数据之后，停止刷新
-                    ptrWrapper.stopRefresh();
-                }
-            }
-        };
+                break;
+            default:
+                throw new UnsupportedOperationException(path);
 
-        EShopClient.getInstance().enqueue(ApiPath.HOME_DATA, null, HomeBannerRsp.class, bannerCallBack);
-        EShopClient.getInstance().enqueue(ApiPath.HOME_CATEGORY, null, HomeCategoryRsp.class, categoryCallback);
+        }
 
+        if (bannerRefreshed && categoryRefreshed) {
+            //两个接口都拿到数据之后，停止刷新
+            ptrWrapper.stopRefresh();
+        }
     }
 
     //设置促销商品展示

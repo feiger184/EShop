@@ -12,10 +12,9 @@ import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseFragment;
 import com.ghf.eshop.base.wrapper.ToolbarWrapper;
 import com.ghf.eshop.feature.serach.SearchGoodsActivity;
-import com.ghf.eshop.network.EShopClient;
+import com.ghf.eshop.network.api.ApiCategory;
 import com.ghf.eshop.network.core.ApiPath;
 import com.ghf.eshop.network.core.ResponseEntity;
-import com.ghf.eshop.network.core.UICallback;
 import com.ghf.eshop.network.entity.category.CategoryPrimary;
 import com.ghf.eshop.network.entity.category.CategoryRsp;
 import com.ghf.eshop.network.entity.search.Filter;
@@ -67,22 +66,21 @@ public class CategoryFragment extends BaseFragment {
 
         } else {
             //进行网络请求拿到数据
-            UICallback uiCallback = new UICallback() {
-                @Override
-                public void onBusinessResponse(boolean isSucces, ResponseEntity responseEntity) {
-
-                    if (isSucces) {
-                        CategoryRsp categoryRsp = (CategoryRsp) responseEntity;
-                        datas = categoryRsp.getData();
-
-                        updateCategory();
-                    }
-                }
-            };
-
-            EShopClient.getInstance().enqueue(ApiPath.CATEGORY, null, CategoryRsp.class, uiCallback);
+            enqueue(new ApiCategory());
         }
+    }
 
+    @Override
+    protected void onBusinessResponse(String path, boolean isSucces, ResponseEntity responseEntity) {
+        if (!ApiPath.CATEGORY.equals(path)) {
+            throw new UnsupportedOperationException(path);
+        }
+        if (isSucces) {
+            CategoryRsp categoryRsp = (CategoryRsp) responseEntity;
+            datas = categoryRsp.getData();
+
+            updateCategory();
+        }
 
     }
 

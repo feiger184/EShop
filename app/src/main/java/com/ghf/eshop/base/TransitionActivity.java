@@ -2,6 +2,7 @@ package com.ghf.eshop.base;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import com.ghf.eshop.R;
 
@@ -17,6 +18,16 @@ public class TransitionActivity extends AppCompatActivity {
         setTransitionAnimation(true);
     }
 
+    // 处理返回箭头的事件
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId()==android.R.id.home){
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {

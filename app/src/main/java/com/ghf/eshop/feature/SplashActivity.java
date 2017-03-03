@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.ghf.eshop.MainActivity;
 import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseActivity;
+import com.ghf.eshop.network.core.ResponseEntity;
 
 import butterknife.BindView;
 
@@ -19,6 +20,11 @@ public class SplashActivity extends BaseActivity implements Animator.AnimatorLis
     @Override
     protected int getContentViewLayout() {
         return R.layout.activity_splash;
+    }
+
+    @Override
+    protected void onBusinessResponse(String path, boolean isSucces, ResponseEntity responseEntity) {
+
     }
 
     @Override

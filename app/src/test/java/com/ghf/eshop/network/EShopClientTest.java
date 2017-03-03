@@ -1,8 +1,12 @@
 package com.ghf.eshop.network;
 
+import com.ghf.eshop.network.api.ApiCategory;
+import com.ghf.eshop.network.api.ApiHomeBanner;
+import com.ghf.eshop.network.api.ApiHomeCategory;
+import com.ghf.eshop.network.api.ApiSearch;
 import com.ghf.eshop.network.entity.category.CategoryRsp;
 import com.ghf.eshop.network.entity.home.HomeBannerRsp;
-import com.ghf.eshop.network.entity.search.SearchReq;
+import com.ghf.eshop.network.entity.home.HomeCategoryRsp;
 import com.ghf.eshop.network.entity.search.SearchRsp;
 
 import org.junit.Test;
@@ -16,27 +20,27 @@ public class EShopClientTest {
     @Test
     public void getCategory() throws Exception {
 
-        CategoryRsp categoryRsp = EShopClient.getInstance().execute("/category", null, CategoryRsp.class);
+        CategoryRsp categoryRsp = EShopClient.getInstance().execute(new ApiCategory());
         // 断言方法：为我们做一个判断
         assertTrue(categoryRsp.getStatus().isSucceed());
     }
 
     @Test
-    public void getHomeBanner() throws Exception{
-        HomeBannerRsp bannerRsp = EShopClient.getInstance().execute("/home/data", null, HomeBannerRsp.class);
+    public void getHomeBanner() throws Exception {
+        HomeBannerRsp bannerRsp = EShopClient.getInstance().execute(new ApiHomeBanner());
         assertTrue(bannerRsp.getStatus().isSucceed());
     }
 
     @Test
-    public void getHomeCategory() throws Exception{
-        CategoryRsp categoryRsp = EShopClient.getInstance().execute("/home/category", null, CategoryRsp.class);
+    public void getHomeCategory() throws Exception {
+        HomeCategoryRsp categoryRsp = EShopClient.getInstance().execute(new ApiHomeCategory());
         assertTrue(categoryRsp.getStatus().isSucceed());
     }
 
     @Test
-    public void getSearch() throws Exception{
-        SearchReq searchReq = new SearchReq();
-        SearchRsp searchRsp = EShopClient.getInstance().execute("/search", searchReq, SearchRsp.class);
+    public void getSearch() throws Exception {
+        ApiSearch apiSearch = new ApiSearch(null, null);
+        SearchRsp searchRsp = EShopClient.getInstance().execute(apiSearch);
         assertTrue(searchRsp.getStatus().isSucceed());
     }
 }
