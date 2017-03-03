@@ -12,18 +12,16 @@ import com.ghf.eshop.base.BaseFragment;
 import com.ghf.eshop.base.wrapper.ToastWrapper;
 import com.ghf.eshop.base.wrapper.ToolbarWrapper;
 import com.ghf.eshop.network.EShopClient;
+import com.ghf.eshop.network.core.ApiPath;
+import com.ghf.eshop.network.core.ResponseEntity;
 import com.ghf.eshop.network.core.UICallback;
 import com.ghf.eshop.network.entity.category.CategoryPrimary;
 import com.ghf.eshop.network.entity.category.CategoryRsp;
-import com.google.gson.Gson;
 
-import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnItemClick;
-import okhttp3.Call;
-import okhttp3.Response;
 
 public class CategoryFragment extends BaseFragment {
     @BindView(R.id.standard_toolbar_title)
@@ -67,26 +65,20 @@ public class CategoryFragment extends BaseFragment {
 
         } else {
             //进行网络请求拿到数据
-            Call call = EShopClient.getInstance().getCategory();
-            call.enqueue(new UICallback() {
+            UICallback uiCallback = new UICallback() {
                 @Override
-                public void onFailureInUI(Call call, IOException e) {
-                    ToastWrapper.show("请求失败");
-                }
+                public void onBusinessResponse(boolean isSucces, ResponseEntity responseEntity) {
 
-                @Override
-                public void onResponseInUI(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        CategoryRsp categoryRsp = new Gson().fromJson(response.body().string(), CategoryRsp.class);
-                        if (categoryRsp.getStatus().isSucceed()) {
-                            datas = categoryRsp.getData();
-                            //更新UI
-                            updateCategory();
-                        }
+                    if (isSucces) {
+                        CategoryRsp categoryRsp = (CategoryRsp) responseEntity;
+                        datas = categoryRsp.getData();
 
+                        updateCategory();
                     }
                 }
-            });
+            };
+
+            EShopClient.getInstance().enqueue(ApiPath.CATEGORY, null, CategoryRsp.class, uiCallback);
         }
 
 

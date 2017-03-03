@@ -1,6 +1,6 @@
 package com.ghf.eshop.network.entity.home;
 
-import com.ghf.eshop.network.entity.category.Status;
+import com.ghf.eshop.network.core.ResponseEntity;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -8,15 +8,10 @@ import java.util.List;
 /**
  * 首页轮播图接口响应体.
  */
-public class HomeBannerRsp {
+public class HomeBannerRsp extends ResponseEntity {
 
-    @SerializedName("data") private Data mData;
-
-    @SerializedName("status") private Status mStatus;
-
-    public Status getStatus() {
-        return mStatus;
-    }
+    @SerializedName("data")
+    private Data mData;
 
     public Data getData() {
         return mData;
@@ -25,10 +20,12 @@ public class HomeBannerRsp {
     public static class Data {
 
         // 首页轮播图
-        @SerializedName("player") private List<Banner> mBanners;
+        @SerializedName("player")
+        private List<Banner> mBanners;
 
         // 首页促销商品
-        @SerializedName("promote_goods") private List<SimpleGoods> mGoodsList;
+        @SerializedName("promote_goods")
+        private List<SimpleGoods> mGoodsList;
 
         public List<Banner> getBanners() {
             return mBanners;

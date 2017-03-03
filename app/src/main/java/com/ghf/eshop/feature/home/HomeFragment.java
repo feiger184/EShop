@@ -15,16 +15,16 @@ import com.ghf.eshop.base.wrapper.PtrWrapper;
 import com.ghf.eshop.base.wrapper.ToastWrapper;
 import com.ghf.eshop.base.wrapper.ToolbarWrapper;
 import com.ghf.eshop.network.EShopClient;
+import com.ghf.eshop.network.core.ApiPath;
+import com.ghf.eshop.network.core.ResponseEntity;
 import com.ghf.eshop.network.core.UICallback;
 import com.ghf.eshop.network.entity.home.Banner;
 import com.ghf.eshop.network.entity.home.HomeBannerRsp;
 import com.ghf.eshop.network.entity.home.HomeCategoryRsp;
 import com.ghf.eshop.network.entity.home.Picture;
 import com.ghf.eshop.network.entity.home.SimpleGoods;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
@@ -32,8 +32,6 @@ import butterknife.ButterKnife;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import jp.wasabeef.picasso.transformations.GrayscaleTransformation;
-import okhttp3.Call;
-import okhttp3.Response;
 
 /**
  * 首页Fragment
@@ -55,6 +53,10 @@ public class HomeFragment extends BaseFragment {
     private HomeGoodsAdapter goodsAdapter;
     private PtrWrapper ptrWrapper;
 
+    private boolean bannerRefreshed = false;
+    private boolean categoryRefreshed = false;
+
+
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
@@ -74,8 +76,12 @@ public class HomeFragment extends BaseFragment {
 
             @Override
             protected void onRefresh() {
+
+                bannerRefreshed = false;
+                categoryRefreshed = false;
                 getHomeData();
             }
+
             @Override
             protected void onLoadMore() {
 
@@ -117,59 +123,46 @@ public class HomeFragment extends BaseFragment {
         goodsAdapter = new HomeGoodsAdapter();
         listView.setAdapter(goodsAdapter);
     }
+
     /*
     * 去请求数据
     * */
     public void getHomeData() {
-
-        Call bannerCall = EShopClient.getInstance().getHomeBanner();
-        bannerCall.enqueue(new UICallback() {
+        UICallback bannerCallBack = new UICallback() {
             @Override
-            public void onFailureInUI(Call call, IOException e) {
-                ToastWrapper.show("请求失败");
-            }
-
-            @Override
-            public void onResponseInUI(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String json = response.body().string();
-                    HomeBannerRsp bannerRsp = new Gson().fromJson(json, HomeBannerRsp.class);
-                    if (bannerRsp.getStatus().isSucceed()) {
-                        //拿到数据
-                        bannerAdapter.reset(bannerRsp.getData().getBanners());
-                        setPromoteGoods(bannerRsp.getData().getGoodsList());
-                    } else {
-                        ToastWrapper.show(bannerRsp.getStatus().getErrorDesc());
-                    }
+            public void onBusinessResponse(boolean isSucces, ResponseEntity responseEntity) {
+                bannerRefreshed = true;
+                if (isSucces) {
+                    HomeBannerRsp bannerRsp = (HomeBannerRsp) responseEntity;
+                    bannerAdapter.reset(bannerRsp.getData().getBanners());
+                    setPromoteGoods(bannerRsp.getData().getGoodsList());
+                }
+                if (bannerRefreshed && categoryRefreshed) {
+                    //两个接口都拿到数据之后，停止刷新
+                    ptrWrapper.stopRefresh();
                 }
             }
-        });
+        };
 
-        //推荐商品信息
-        Call categoryCall = EShopClient.getInstance().getHomeCategory();
-        categoryCall.enqueue(new UICallback() {
+        // 首页分类商品和推荐
+        UICallback categoryCallback = new UICallback() {
             @Override
-            public void onFailureInUI(Call call, IOException e) {
-                ToastWrapper.show("请求失败");
-            }
-
-            @Override
-            public void onResponseInUI(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String string = response.body().string();
-                    HomeCategoryRsp categoryRsp = new Gson().fromJson(string, HomeCategoryRsp.class);
-                    if (categoryRsp.getStatus().isSucceed()) {
-                        //拿到了推荐分类商品的数据
-                        goodsAdapter.reset(categoryRsp.getData());
-                    } else {
-                        ToastWrapper.show(categoryRsp.getStatus().getErrorDesc());
-                    }
+            public void onBusinessResponse(boolean isSucces, ResponseEntity responseEntity) {
+                categoryRefreshed = true;
+                if (isSucces) {
+                    HomeCategoryRsp categoryRsp = (HomeCategoryRsp) responseEntity;
+                    goodsAdapter.reset(categoryRsp.getData());
+                }
+                if (bannerRefreshed && categoryRefreshed) {
+                    //两个接口都拿到数据之后，停止刷新
+                    ptrWrapper.stopRefresh();
                 }
             }
-        });
+        };
 
-        //停止刷新
-       ptrWrapper.stopRefresh();
+        EShopClient.getInstance().enqueue(ApiPath.HOME_DATA, null, HomeBannerRsp.class, bannerCallBack);
+        EShopClient.getInstance().enqueue(ApiPath.HOME_CATEGORY, null, HomeCategoryRsp.class, categoryCallback);
+
     }
 
     //设置促销商品展示
