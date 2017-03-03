@@ -5,6 +5,8 @@ import android.content.Intent;
 
 import com.ghf.eshop.R;
 import com.ghf.eshop.base.BaseActivity;
+import com.ghf.eshop.base.wrapper.ToolbarWrapper;
+import com.ghf.eshop.network.core.ApiPath;
 import com.ghf.eshop.network.core.ResponseEntity;
 
 public class GoodsActivity extends BaseActivity {
@@ -26,12 +28,18 @@ public class GoodsActivity extends BaseActivity {
 
     @Override
     protected void onBusinessResponse(String path, boolean isSucces, ResponseEntity responseEntity) {
+        if (!ApiPath.GOODS_INFO.equals(path)) {
+            throw new UnsupportedOperationException(path);
+        }
+
+
 
     }
 
     @Override
     protected void initView() {
 
+        new ToolbarWrapper(this);
     }
 
 }

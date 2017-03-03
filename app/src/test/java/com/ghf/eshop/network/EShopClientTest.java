@@ -1,10 +1,12 @@
 package com.ghf.eshop.network;
 
 import com.ghf.eshop.network.api.ApiCategory;
+import com.ghf.eshop.network.api.ApiGoodsInfo;
 import com.ghf.eshop.network.api.ApiHomeBanner;
 import com.ghf.eshop.network.api.ApiHomeCategory;
 import com.ghf.eshop.network.api.ApiSearch;
 import com.ghf.eshop.network.entity.category.CategoryRsp;
+import com.ghf.eshop.network.entity.goodsinfo.GoodsInfoRsp;
 import com.ghf.eshop.network.entity.home.HomeBannerRsp;
 import com.ghf.eshop.network.entity.home.HomeCategoryRsp;
 import com.ghf.eshop.network.entity.search.SearchRsp;
@@ -42,5 +44,12 @@ public class EShopClientTest {
         ApiSearch apiSearch = new ApiSearch(null, null);
         SearchRsp searchRsp = EShopClient.getInstance().execute(apiSearch);
         assertTrue(searchRsp.getStatus().isSucceed());
+    }
+
+    @Test
+    public void getGoodsInfo() throws Exception {
+        ApiGoodsInfo goodsInfo = new ApiGoodsInfo(79);
+        GoodsInfoRsp goodsInfoRsp = EShopClient.getInstance().execute(goodsInfo);
+        assertTrue(goodsInfoRsp.getStatus().isSucceed());
     }
 }

@@ -10,4 +10,5 @@ public interface ApiPath {
     String HOME_DATA = "/home/data";
     String HOME_CATEGORY = "/home/category";
     String SEARCH = "/search";
+    String GOODS_INFO = "/goods";
 }
