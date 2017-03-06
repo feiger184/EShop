@@ -114,13 +114,13 @@
                 android:textAppearance="@style/ContentText.Large"/>
 
             <!--自定义控件：数量选择器-->
-            <!--
-            <com.feicuiedu.eshop.base.widgets.SimpleNumberPicker
+
+            <com.ghf.eshop.base.widgets.SimpleNumberPicker
                 android:id="@+id/number_picker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_tiny"/>
--->
+
         </LinearLayout>
 
     </ScrollView>
